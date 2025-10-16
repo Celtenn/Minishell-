@@ -198,6 +198,7 @@ Bash’te deneyip çalışmasını anlayamadığın komutları strace veya bash 
  << DELIM heredoc girdisi çalışıyor mu?
  
 ✅ ENVIRONMENT VARIABLE EXPANSION
+
 5.
  echo $HOME ortam değişkenini gösteriyor mu?
 
