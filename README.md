@@ -196,7 +196,7 @@ Bash’te deneyip çalışmasını anlayamadığın komutları strace veya bash 
  >> çıktıyı ekliyor mu?
 
  << DELIM heredoc girdisi çalışıyor mu?
-
+ 
 ✅ ENVIRONMENT VARIABLE EXPANSION
 5. 🔹 $VAR & $?
  echo $HOME ortam değişkenini gösteriyor mu?
