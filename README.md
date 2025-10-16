@@ -1,4 +1,4 @@
-// valgrind --leak-check=full --show-leak-kinds=all --suppressions=readline.supp --track-fds=yes ./minishell
+// readline dan gelen leaki engellemek "valgrind --leak-check=full --show-leak-kinds=all --suppressions=readline.supp --track-fds=yes ./minishell"
 # Minishell
 
 ✅ 1. Proje Gereksinimlerini Oku ve Anla
