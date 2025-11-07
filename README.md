@@ -36,6 +36,7 @@ minishell/
 │   └── minishell.h
 ├── Makefile
 └── README.md
+
 ✅ 3. Basit Prompt ile Başla
 ✨ readline ile bir input al:
 c
