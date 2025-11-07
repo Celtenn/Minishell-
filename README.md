@@ -1,231 +1,191 @@
-// readline dan gelen leaki engellemek "valgrind --leak-check=full --show-leak-kinds=all --suppressions=readline.supp --track-fds=yes ./minishell"
-# Minishell
+// valgrind --leak-check=full --show-leak-kinds=all --suppressions=readline.supp --track-fds=yes ./minishell
+<!-- ====================================================== -->
+<!-- 🌙 Minishell — by Enes Kahraman, 42 Kocaeli -->
+<!-- ====================================================== -->
 
-✅ 1. Proje Gereksinimlerini Oku ve Anla
-Proje dokümanını dikkatlice oku. Minishell projesinde genelde istenenler:
+<p align="center">
+  <img src="https://readme-typing-svg.herokuapp.com?font=Fira+Code&size=28&pause=1000&color=00FF9C&center=true&vCenter=true&width=600&lines=💻+Minishell;Bir+Kabuk+(Shell)+Yazılımı;C+ile+Unix+Kabuk+Simülasyonu;42+Kocaeli+Projesi" alt="Typing SVG" />
+</p>
 
-Komutları işleyebilme (ls, echo, vs.)
+---
 
-Pipe (|)
+<p align="center">
+  <img src="https://img.shields.io/badge/Dil-C-blue?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/Okul-42_Kocaeli-green?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/Proje-Minishell-lightgrey?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/Durum-Tamamlandı-success?style=for-the-badge" />
+</p>
 
-Redirection (<, >, >>, <<)
+---
 
-Built-in komutlar (cd, export, unset, env, exit, pwd, echo)
+## 🧠 Proje Hakkında
 
-Ortam değişkenleri yönetimi
+**Minishell**, 42 okullarında verilen sistem programlama projelerinden biridir.  
+Amaç, bir Unix kabuğunun (bash benzeri) **kendi basitleştirilmiş sürümünü** yazmaktır.  
+Bu proje ile **komut yorumlama, süreç yönetimi, sinyaller, pipe ve redirection** gibi konular öğrenilir.
 
-CTRL+C, CTRL+D, CTRL+\ gibi sinyallerle doğru tepki
+> “Bir kabuğu anlamanın en iyi yolu, onu kendin yazmaktır.” — *42 Philosophy*
 
-Global exit status yönetimi
+---
 
-✅ 2. Temel Yapıyı Oluştur
+## 🧩 Öğrenilen Temeller
 
-📁 Dosya Yapısı Örneği:
-css
-Kopyala
-Düzenle
+| Konu | Açıklama |
+|------|-----------|
+| 🧮 **Parsing & Tokenization** | Kullanıcı girişini ayrıştırma ve argümanlara bölme. |
+| 🔁 **Pipes & Redirections** | Komutları birbirine bağlama ve yönlendirme. |
+| ⚙️ **Process Control (fork/exec)** | Yeni işlemler yaratma ve program yürütme. |
+| 🧵 **Signals** | Ctrl+C, Ctrl+D, Ctrl+\ gibi sinyalleri yakalama. |
+| 🧰 **Environment Variables** | PATH, HOME gibi ortam değişkenlerinin yönetimi. |
+
+---
+
+## ⚙️ Kurulum ve Çalıştırma
+
+### 📦 Gereksinimler
+- macOS veya Linux  
+- `gcc` veya `clang`  
+- `make`
+
+### 🧰 Derleme
+
+```bash
+git clone https://github.com/Celtenn/minishell.git
+cd minishell
+make
+```
+
+### ▶️ Çalıştırma
+
+```bash
+./minishell
+```
+
+### 🧨 Örnek Kullanımlar
+
+```bash
+minishell> echo Merhaba Dünya
+Merhaba Dünya
+
+minishell> ls -la | grep src
+src/
+
+minishell> export TEST=42
+minishell> echo $TEST
+42
+
+minishell> cd ..
+minishell> pwd
+/home/enes
+```
+
+---
+
+## 🖥️ Desteklenen Komutlar
+
+| Komut | Açıklama |
+|:------|:----------|
+| `echo` | Yazıyı ekrana bastırır |
+| `cd` | Dizin değiştirir |
+| `pwd` | Mevcut dizini gösterir |
+| `export` | Ortam değişkeni ekler |
+| `unset` | Ortam değişkeni kaldırır |
+| `env` | Ortam değişkenlerini listeler |
+| `exit` | Kabuktan çıkar |
+
+> 🔧 Ek olarak `|`, `>`, `<`, `>>`, `<<` (heredoc) yönlendirmeleri desteklenir.
+
+---
+
+## 🗂️ Örnek Proje Dizini
+
+```
 minishell/
-│
-├── src/
+├── includes/
+│   └── minishell.h
+├── srcs/
 │   ├── main.c
 │   ├── parser/
+│   │   ├── lexer.c
+│   │   ├── parser.c
+│   │   └── tokenizer.c
 │   ├── executor/
-│   ├── builtin/
-│   ├── signals/
+│   │   ├── exec.c
+│   │   ├── pipe.c
+│   │   └── redirection.c
+│   ├── builtins/
+│   │   ├── echo.c
+│   │   ├── cd.c
+│   │   ├── pwd.c
+│   │   ├── env.c
+│   │   ├── export.c
+│   │   └── unset.c
 │   └── utils/
-├── include/
-│   └── minishell.h
+│       ├── signals.c
+│       ├── error.c
+│       └── memory.c
 ├── Makefile
 └── README.md
+```
 
-✅ 3. Basit Prompt ile Başla
+---
 
-✨ readline ile bir input al:
-c
+## 🧮 Teknik Detaylar
 
-#include <readline/readline.h>
+### 🔹 Komut Yürütme Akışı
 
-#include <readline/history.h>
+1. **Input okuma** (`readline`)  
+2. **Tokenize etme** (boşluk, pipe, redirection ayrımı)  
+3. **Parse etme** (AST — Abstract Syntax Tree oluşturulur)  
+4. **Fork & Exec** işlemleriyle komut çalıştırma  
+5. **Sinyal yönetimi** ve bekleme (`waitpid`)
 
-int main(void)
-{
-    char *input;
+### 🔹 Örnek Akış Şeması
 
-    while (1)
-    {
-        input = readline("minishell$ ");
-        if (!input)
-            break;
-        add_history(input);
-        free(input);
-    }
-    return (0);
-}
-Bu sayede kullanıcıdan sürekli komut alabilirsin.
+<p align="center">
+  <img src="miniakis.png" width="600" alt="Minishell Akış Şeması">
+</p>
 
-✅ 4. Parsing (Tokenize Etme)
-🔍 Yapılacaklar:
-Komutu ve argümanları parçalara ayır.
+---
 
-Quote’lara saygı göster: "echo hello world" ile 'echo hello world'
+## 🧰 Makefile Komutları
 
-Redirectionları (>, >>, <, <<) ve pipe’ları (|) tanı.
+| Komut | Açıklama |
+|--------|-----------|
+| `make` | Projeyi derler |
+| `make clean` | Ara dosyaları temizler |
+| `make fclean` | Tüm derleme dosyalarını siler |
+| `make re` | Baştan derler |
 
-Bash'teki gibi export VAR=value gibi komutları anlamlandır.
+---
 
-Her komut bir yapı (struct) içinde tutulmalı.
+## 🧑‍💻 Yazar
 
-✅ 5. Built-in Komutları Yaz
-Komut	Açıklama
-echo	Argümanları yazar. -n desteği gerekir.
-cd	Dizin değiştirir.
-pwd	Çalışılan dizini yazdırır.
-export	Ortam değişkeni ekler/günceller
-unset	Ortam değişkenini siler
-env	Ortam değişkenlerini listeler
-exit	Shell'den çıkar
+**Enes Kahraman**  
+📍 42 Kocaeli  
+🔗 [GitHub: Celtenn](https://github.com/Celtenn)
 
-Built-in komutlar dışındaki komutlar için execve çağrısı yapılmalı.
+---
 
-✅ 6. Redirection (Yönlendirme) Desteği
-🚀 Desteklenmesi gerekenler:
->: stdout dosyaya yönlendirme
+## 🌟 Özellikler
 
->>: stdout dosyaya ekleme
+✅ Multi-pipe desteği  
+✅ Environment değişken yönetimi  
+✅ Heredoc (`<<`) desteği  
+✅ Hatalı syntax kontrolü  
+✅ Sinyal yakalama (Ctrl+C, Ctrl+D)  
+✅ Bellek sızıntısız yapı  
 
-<: stdin dosyadan alma
+---
 
-<<: here_doc (kullanıcının girişini belirli bir anahtara kadar oku)
+## 🧾 Lisans
 
-dup2() sistem çağrısı ile yönlendirme yapılır.
+Bu proje, **42 Kocaeli** kapsamında eğitim amaçlı olarak geliştirilmiştir.  
+Tüm hakları **Enes Kahraman**’a aittir.  
+Öğrenim ve paylaşım amacıyla kullanılabilir.
 
-✅ 7. Pipe (|) Desteği
-Bir komutun çıktısını diğer komutun girdisi yap.
+---
 
-fork() ile her komutu bir child process olarak çalıştır.
-
-pipe() ile iki process arasında bağlantı kur.
-
-Çoklu pipe’ları destekle (örneğin: ls | grep txt | wc -l)
-
-✅ 8. Sinyal Yönetimi
-🎯 Gerekli sinyaller:
-CTRL+C (SIGINT) → prompt sıfırlanmalı
-
-CTRL+\ (SIGQUIT) → bazı durumlarda çıkış yapılmalı
-
-CTRL+D → input NULL olur, shell kapanmalı
-
-signal() veya sigaction() kullanarak bu sinyallere özel davranış tanımlanmalı.
-
-✅ 9. Çevresel Değişkenleri Yönet
-Başlangıçta envp’yi kopyala.
-
-export, unset, env gibi komutlarla güncelle.
-
-execve çağrısı yapılırken ortam değişkenleri hazırlanmalı.
-
-✅ 10. Global Exit Status Yönetimi
-Her komutun sonunda global bir exit_status güncellenmeli.
-
-$? çağrıldığında son exit code döndürülmeli.
-
-✅ 11. Bellek Yönetimi ve Leak Kontrolü
-Tüm malloclar free ile serbest bırakılmalı.
-
-Her bir input’tan sonra kullanılan hafıza temizlenmeli.
-
-valgrind ile test yap.
-
-✅ 12. Bonus (Zorunlu Değil Ama Tavsiye Edilenler)
-Wildcard desteği (*)
-
-Logical operators (&&, ||)
-
-Parantez desteği
-
-Komut geçmişi dosyaya kaydetme
-
-✅ 13. Test Etme ve Son Rötuşlar
-Gerçek shell’de yaptığın testleri burada da dene.
-
-Komutlar sırayla düzgün çalışıyor mu?
-
-Edge case'leri test et: boş input, tek quote, çoklu pipe, vs.
-
-✳️ Ekstra İpuçları:
-Kodunu modüler yaz. Her .c dosyası tek bir işi yapsın.
-
-Header dosyasını temiz tut.
-
-Sık sık make clean && make && valgrind ./minishell yaparak kontrol et.
-
-Bash’te deneyip çalışmasını anlayamadığın komutları strace veya bash -x ile takip et.
---------------------------------------------------------------------------------------------------------------------------------------------------------
-✅ GENEL TEST KONTROL LİSTESİ (MANDATORY ÖZELLİKLER)
-1. 🔹 Giriş & Prompt
- readline() prompt'u gösteriyor mu?
-
- Ctrl-D (EOF) shell'den çıkıyor mu?
-
- Ctrl-C yeni satıra geçip prompt'u gösteriyor mu?
-
-2. 🔹 Tokenizer (lexer)
- "çift tırnak" ve 'tek tırnak' içindeki boşluklar korunuyor mu?
-
- |, <, >, <<, >> gibi özel karakterler doğru tanınıyor mu?
-
- echo hello | wc gibi pipe'lı komutlar tokenize ediliyor mu?
-
- Tırnaklar kapatılmadığında hata döndürülüyor mu?
-
-3. 🔹 Parser
- echo hello | wc komutu iki ayrı t_cmd objesi olarak parse ediliyor mu?
-
- Redirection'lar (>, <, >>, <<) doğru parse ediliyor mu?
-
- cmd->argv dizisi null sonlandırılmış mı?
-
-✅ KOMUT ÇALIŞTIRMA VE PIPE
-4. 🔹 Komut Yürütme (execve, pipe)
- ls çalışıyor mu?
-
- ls -l | grep .c gibi komutlar pipe'la doğru akıyor mu?
-
- cat < input.txt input dosyasını okuyor mu?
-
- echo hello > output.txt çıktıyı dosyaya yazıyor mu?
-
- >> çıktıyı ekliyor mu?
-
- << DELIM heredoc girdisi çalışıyor mu?
- 
-✅ ENVIRONMENT VARIABLE EXPANSION
-
-5.
- echo $HOME ortam değişkenini gösteriyor mu?
-
- echo $? son komutun exit status'unu gösteriyor mu?
-
- export VAR=value sonrası echo $VAR doğru değer döndürüyor mu?
-
- unset VAR sonrası echo $VAR boş döndürüyor mu?
-
-✅ BUILT-IN KOMUTLAR
-Komut	Kontrol
-cd	cd .., cd /, cd dosya çalışıyor mu?
-pwd	pwd mevcut dizini gösteriyor mu?
-echo	echo hello, echo -n no-newline
-exit	exit, exit 42 shell'den çıkıyor mu?
-env	Ortam değişkenlerini listeliyor mu?
-export	Yeni değişken ekliyor ve $VAR ile görünüyor mu?
-unset	Değişkeni ortamdan kaldırıyor mu?
-
-✅ BELLEK & HATA YÖNETİMİ
- Tüm malloc, strdup, realloc işlemleri NULL kontrolü içeriyor mu?
-
- Bellek sızıntısı (valgrind ile test edilebilir) var mı?
-
- Hatalı quote/pipe/redirect gibi hatalar düzgün mesaj veriyor mu?
-
- Shell crash etmiyor mu? (örneğin boş echo, export, unset çağrısı)
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=waving&color=00FF9C&height=100&section=footer&text=⭐%20Bir%20yıldız%20bırak%20ve%20destekle!%20⭐&fontSize=20&fontColor=ffffff" />
+</p>
