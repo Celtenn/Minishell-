@@ -42,8 +42,7 @@ minishell/
 
 ✨ readline ile bir input al:
 c
-Kopyala
-Düzenle
+
 #include <readline/readline.h>
 #include <readline/history.h>
 
