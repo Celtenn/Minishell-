@@ -1,4 +1,5 @@
-// valgrind --leak-check=full --show-leak-kinds=all --suppressions=readline.supp --track-fds=yes ./minishell  ( readline dan gelen sızıntıyı göstermez
+// valgrind --leak-check=full --show-leak-kinds=all --suppressions=readline.supp --track-fds=yes ./minishell 
+( readline dan gelen sızıntıyı göstermez )
 <!-- ====================================================== -->
 <!-- 🌙 Minishell — by Enes Kahraman, 42 Kocaeli -->
 <!-- ====================================================== -->
