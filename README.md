@@ -19,6 +19,7 @@ CTRL+C, CTRL+D, CTRL+\ gibi sinyallerle doğru tepki
 Global exit status yönetimi
 
 ✅ 2. Temel Yapıyı Oluştur
+
 📁 Dosya Yapısı Örneği:
 css
 Kopyala
@@ -38,6 +39,7 @@ minishell/
 └── README.md
 
 ✅ 3. Basit Prompt ile Başla
+
 ✨ readline ile bir input al:
 c
 Kopyala
